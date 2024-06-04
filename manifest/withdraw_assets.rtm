@@ -1,0 +1,36 @@
+CALL_METHOD
+  Address("${account_1}")
+  "lock_fee"
+  Decimal("5000")
+;
+
+CALL_METHOD
+  Address("${account_1}")
+  "withdraw_non_fungibles"
+  Address("${badge_address}")
+  Array<NonFungibleLocalId>(
+    NonFungibleLocalId("${id}"),
+  )
+;
+
+TAKE_NON_FUNGIBLES_FROM_WORKTOP
+  Address("${badge_address}")
+  Array<NonFungibleLocalId>(
+    NonFungibleLocalId("${id}"),
+  )
+  Bucket("bucket1")
+;
+
+CALL_METHOD
+  Address("${swap_component}")
+  "withdraw_assets"
+  Bucket("bucket1")
+;
+
+CALL_METHOD
+    Address("${account_1}")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;
+

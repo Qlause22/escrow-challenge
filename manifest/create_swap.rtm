@@ -1,0 +1,97 @@
+CALL_METHOD
+  Address("${account_1}")
+  "lock_fee"
+  Decimal("5000")
+;
+
+CALL_METHOD
+  Address("${account_1}")
+  "withdraw"
+  Address("resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3")
+  Decimal("10")  
+;
+
+
+CALL_METHOD
+  Address("${account_1}")
+  "withdraw"
+  Address("${ft_resource_1}")
+  Decimal("10")  
+;
+
+CALL_METHOD
+  Address("${account_1}")
+  "withdraw_non_fungibles"
+  Address("${nft_resource_1}")
+  Array<NonFungibleLocalId>(
+    NonFungibleLocalId("#1#"),
+    NonFungibleLocalId("#2#"),
+    NonFungibleLocalId("#3#")
+  )
+;
+
+TAKE_FROM_WORKTOP
+  Address("resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3")
+  Decimal("10")
+  Bucket("bucket1")
+;
+
+TAKE_FROM_WORKTOP
+  Address("${ft_resource_1}")
+  Decimal("10")
+  Bucket("bucket2")
+;
+
+TAKE_NON_FUNGIBLES_FROM_WORKTOP
+  Address("${nft_resource_1}")
+  Array<NonFungibleLocalId>(
+    NonFungibleLocalId("#1#"),
+    NonFungibleLocalId("#2#"),
+    NonFungibleLocalId("#3#"),
+  )
+  Bucket("bucket3")
+;
+
+CALL_METHOD
+  Address("${escrow_component}")
+  "create_swap"
+  Tuple(
+    Tuple(
+      Some(
+        Array<Bucket>(
+          Bucket("bucket1"),
+          Bucket("bucket2"),
+        )
+      ),
+      Some(
+        Array<Bucket>(
+          Bucket("bucket3"),
+        )
+      )
+    ),
+    Tuple(
+      Some(
+        Map<Address, Decimal>(
+          Address("${ft_resource_2}") => Decimal("10"),
+          Address("resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3") => Decimal("10"),
+        )
+      ),
+      Some(
+        Map<Address, Array>(
+          Address("${nft_resource_2}") => 
+            Array<NonFungibleLocalId>(
+              NonFungibleLocalId("#1#"),
+              NonFungibleLocalId("#2#"),
+            ),
+        )
+      )
+    )
+  )
+;
+
+CALL_METHOD
+    Address("${account_1}")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;

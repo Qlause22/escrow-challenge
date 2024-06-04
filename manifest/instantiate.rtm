@@ -1,0 +1,13 @@
+CALL_METHOD
+  Address("${account_1}")
+  "lock_fee"
+  Decimal("5000")
+;
+
+CALL_FUNCTION 
+  Address("${escrow_package_address}") 
+  "EscrowProxy" 
+  "instantiate_proxy"
+  None
+;
+
