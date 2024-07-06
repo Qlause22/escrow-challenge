@@ -1,0 +1,195 @@
+CALL_METHOD
+    Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+    "lock_fee"
+    Decimal("5000")
+;
+CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
+    Enum<0u8>()
+    Enum<1u8>()
+    false
+    Enum<0u8>(
+        Enum<0u8>(
+            Tuple(
+                Array<Enum>(),
+                Array<Tuple>(),
+                Array<Enum>()
+            )
+        ),
+        Enum<0u8>(
+            66u8
+        ),
+        Array<String>()
+    )
+    Map<NonFungibleLocalId, Tuple>(
+        NonFungibleLocalId("#1#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#2#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#3#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#4#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#5#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#6#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#7#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#8#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#9#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#10#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#11#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#12#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#13#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#14#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#15#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#16#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#17#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#18#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#19#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#20#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#21#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#22#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#23#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#24#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#25#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#26#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#27#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#28#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#29#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#30#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#31#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#32#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#33#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#34#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#35#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#36#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#37#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#38#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#39#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#40#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#41#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#42#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#43#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#44#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#45#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#46#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#47#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#48#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#49#") => Tuple(
+            Tuple()
+        ),
+        NonFungibleLocalId("#50#") => Tuple(
+            Tuple()
+        ),
+    )
+    Tuple(
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>()
+    )
+    Tuple(
+        Map<String, Tuple>(),
+        Map<String, Enum>()
+    )
+    Enum<0u8>()
+;
+CALL_METHOD
+    Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;

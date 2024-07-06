@@ -188,3 +188,16 @@ impl AssetsAccumulator {
         }
     }
 }
+
+#[derive(ScryptoSbor)]
+pub struct Args {
+    pub offered_resource: Assets,
+    pub requested_resource: RequiredResources,
+}
+
+#[derive(ScryptoSbor)]
+pub struct ArgsSimpleSwap {
+    pub asset: NonFungibleBucket,
+    pub price: Decimal,
+    pub royality_data: Option<RoyalityData>,
+}

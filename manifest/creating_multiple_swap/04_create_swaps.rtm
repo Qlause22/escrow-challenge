@@ -1,0 +1,290 @@
+CALL_METHOD
+    Address("component_sim1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxhkrefh")
+    "lock_fee"
+    Decimal("5000")
+;
+
+CALL_METHOD
+    Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+    "create_proof_of_non_fungibles"
+    Address("resource_sim1nfyeaya6pehau0fn7vgavuggeev64gahsh05dauae2uu25nj28yuf7")
+    Array<NonFungibleLocalId>(
+        NonFungibleLocalId("#1#")
+    )
+;
+
+POP_FROM_AUTH_ZONE
+    Proof("nft_proof")
+;
+
+
+CALL_METHOD
+  Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+  "withdraw_non_fungibles"
+  Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+  Array<NonFungibleLocalId>(
+    NonFungibleLocalId("#1#"),
+    NonFungibleLocalId("#2#"),
+    NonFungibleLocalId("#3#"),
+    NonFungibleLocalId("#4#"),
+    NonFungibleLocalId("#5#"),
+    NonFungibleLocalId("#6#"),
+    NonFungibleLocalId("#7#"),
+    NonFungibleLocalId("#8#"),
+    NonFungibleLocalId("#9#"),
+    NonFungibleLocalId("#10#"),
+    NonFungibleLocalId("#11#"),
+    NonFungibleLocalId("#12#"),
+    NonFungibleLocalId("#13#"),
+    NonFungibleLocalId("#14#"),
+    NonFungibleLocalId("#15#"),
+    NonFungibleLocalId("#16#"),
+    NonFungibleLocalId("#17#"),
+    NonFungibleLocalId("#18#"),
+    NonFungibleLocalId("#19#"),
+    NonFungibleLocalId("#20#"),
+  )
+;
+
+TAKE_NON_FUNGIBLES_FROM_WORKTOP
+  Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+  Array<NonFungibleLocalId>(
+    NonFungibleLocalId("#1#"),
+    NonFungibleLocalId("#2#"),
+    NonFungibleLocalId("#3#"),
+    NonFungibleLocalId("#4#"),
+    NonFungibleLocalId("#5#"),
+    NonFungibleLocalId("#6#"),
+    NonFungibleLocalId("#7#"),
+    NonFungibleLocalId("#8#"),
+    NonFungibleLocalId("#9#"),
+    NonFungibleLocalId("#10#"),
+    NonFungibleLocalId("#11#"),
+    NonFungibleLocalId("#12#"),
+    NonFungibleLocalId("#13#"),
+    NonFungibleLocalId("#14#"),
+    NonFungibleLocalId("#15#"),
+    NonFungibleLocalId("#16#"),
+    NonFungibleLocalId("#17#"),
+    NonFungibleLocalId("#18#"),
+    NonFungibleLocalId("#19#"),
+    NonFungibleLocalId("#20#"),
+  )
+  Bucket("bucket1")
+;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#26#"),
+#   )
+#   Bucket("bucket26")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#27#"),
+#   )
+#   Bucket("bucket27")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#28#"),
+#   )
+#   Bucket("bucket28")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#29#"),
+#   )
+#   Bucket("bucket29")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#30#"),
+#   )
+#   Bucket("bucket30")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#31#"),
+#   )
+#   Bucket("bucket31")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#32#"),
+#   )
+#   Bucket("bucket32")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#33#"),
+#   )
+#   Bucket("bucket33")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#34#"),
+#   )
+#   Bucket("bucket34")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#35#"),
+#   )
+#   Bucket("bucket35")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#36#"),
+#   )
+#   Bucket("bucket36")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#37#"),
+#   )
+#   Bucket("bucket37")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#38#"),
+#   )
+#   Bucket("bucket38")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#39#"),
+#   )
+#   Bucket("bucket39")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#40#"),
+#   )
+#   Bucket("bucket40")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#41#"),
+#   )
+#   Bucket("bucket41")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#42#"),
+#   )
+#   Bucket("bucket42")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#43#"),
+#   )
+#   Bucket("bucket43")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#44#"),
+#   )
+#   Bucket("bucket44")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#45#"),
+#   )
+#   Bucket("bucket45")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#46#"),
+#   )
+#   Bucket("bucket46")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#47#"),
+#   )
+#   Bucket("bucket47")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#48#"),
+#   )
+#   Bucket("bucket48")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#49#"),
+#   )
+#   Bucket("bucket49")
+# ;
+
+# TAKE_NON_FUNGIBLES_FROM_WORKTOP
+#   Address("resource_sim1ng48kwm3pd0s7vcx32nvw3urlf4q3pwlh2mch83s4ewhpfmdqv0xke")
+#   Array<NonFungibleLocalId>(
+#     NonFungibleLocalId("#50#"),
+#   )
+#   Bucket("bucket50")
+# ;
+
+
+CALL_METHOD
+    Address("component_sim1crmf90smj8c52m8r7nsrhvw9a93hxqsadjm09qtnq2paydv2dfvy4s")
+    "create_multiple_swap"
+    Proof("nft_proof")
+    Bucket("bucket1")
+    Decimal("10")
+;
+
+CALL_METHOD
+    Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+    "try_deposit_batch_or_refund"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;

@@ -2,7 +2,7 @@ use crate::common::*;
 use scrypto::prelude::*;
 
 #[blueprint]
-#[types(NonFungibleGlobalId, AssetsAccumulator)]
+#[types(NonFungibleLocalId, AssetsAccumulator)]
 mod avago_swap_bid {
 
     enable_method_auth! {
@@ -21,10 +21,10 @@ mod avago_swap_bid {
     struct AvagoSwapOffer {
         id: u64,
         status: Status,
-        owner: NonFungibleGlobalId,
+        owner: NonFungibleLocalId,
         offered_resource: AssetsAccumulator,
-        offers: KeyValueStore<NonFungibleGlobalId, AssetsAccumulator>,
-        selected: Option<NonFungibleGlobalId>,
+        offers: KeyValueStore<NonFungibleLocalId, AssetsAccumulator>,
+        selected: Option<NonFungibleLocalId>,
         nft_royalities: Option<RoyalityData>,
         service_royality: Decimal,
     }
@@ -32,7 +32,7 @@ mod avago_swap_bid {
     impl AvagoSwapOffer {
         pub fn instantiate(
             service_royality: Decimal,
-            owner: NonFungibleGlobalId,
+            owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u64,
             args: Args,
@@ -42,7 +42,7 @@ mod avago_swap_bid {
                 service_royality,
                 nft_royalities: args.offered_resource.get_royality_data(),
                 owner: owner.clone(),
-                offers: KeyValueStore::<NonFungibleGlobalId, AssetsAccumulator>::new_with_registered_type(),
+                offers: KeyValueStore::<NonFungibleLocalId, AssetsAccumulator>::new_with_registered_type(),
                 offered_resource: AssetsAccumulator::new(args.offered_resource),
                 selected: None,
                 status: Status {
@@ -52,7 +52,7 @@ mod avago_swap_bid {
                 },
             }
             .instantiate()
-            .prepare_to_globalize(OwnerRole::Fixed(rule!(require(owner))))
+            .prepare_to_globalize(OwnerRole::None)
             .roles(roles! {
                 main => rule!(require(global_caller(main)));
             })
@@ -61,8 +61,8 @@ mod avago_swap_bid {
 
         pub fn exchange(
             &mut self,
-            owner: NonFungibleGlobalId,
-            selected: NonFungibleGlobalId,
+            owner: NonFungibleLocalId,
+            selected: NonFungibleLocalId,
         ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
             assert!(
                 owner == self.owner,
@@ -107,7 +107,7 @@ mod avago_swap_bid {
             }
         }
 
-        pub fn cancel_escrow(&mut self, owner: NonFungibleGlobalId) -> Option<Vec<Assets>> {
+        pub fn cancel_escrow(&mut self, owner: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 owner == self.owner,
                 "You are not the owner of this contract swap."
@@ -126,7 +126,7 @@ mod avago_swap_bid {
 
         pub fn offer(
             &mut self,
-            offerer: NonFungibleGlobalId,
+            offerer: NonFungibleLocalId,
             offer_assets: Assets,
         ) -> Option<Vec<Assets>> {
             assert!(
@@ -150,7 +150,7 @@ mod avago_swap_bid {
 
         pub fn withdraw_assets(
             &mut self,
-            offer_winner: NonFungibleGlobalId,
+            offer_winner: NonFungibleLocalId,
         ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
             assert!(
                 self.selected.is_some(),
@@ -180,7 +180,7 @@ mod avago_swap_bid {
             )
         }
 
-        pub fn cancel_offer(&mut self, offerer: NonFungibleGlobalId) -> Option<Vec<Assets>> {
+        pub fn cancel_offer(&mut self, offerer: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 self.selected.is_some(),
                 "The owner is not selected the offer contract yet."

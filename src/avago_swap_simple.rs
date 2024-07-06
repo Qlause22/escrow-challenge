@@ -2,7 +2,7 @@ use crate::common::*;
 use scrypto::prelude::*;
 
 #[blueprint]
-mod avago_swap_basic {
+mod simple_contract {
     enable_method_auth! {
         roles {
             main => updatable_by: [];
@@ -13,40 +13,40 @@ mod avago_swap_basic {
             cancel_escrow => restrict_to: [main];
         }
     }
-    struct AvagoSwapBasic {
+    struct AvagoSwapSimple {
         id: u64,
-        nft_royalities: Option<RoyalityData>,
+        vault: NonFungibleVault,
         service_royality: Decimal,
-        status: Status,
         owner: NonFungibleLocalId,
         taker: Option<NonFungibleLocalId>,
-        offered_resource: AssetsAccumulator,
-        requested_resource: RequiredResources,
-        requested_resource_vault: Option<AssetsAccumulator>,
+        royality_data: Option<RoyalityData>,
+        status: Status,
+        price: Decimal,
+        xrd_vault: Vault,
     }
 
-    impl AvagoSwapBasic {
+    impl AvagoSwapSimple {
         pub fn instantiate(
             service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u64,
-            args: Args,
-        ) -> Global<AvagoSwapBasic> {
+            args: ArgsSimpleSwap,
+        ) -> Global<AvagoSwapSimple> {
             Self {
                 id,
+                owner,
+                price: args.price,
+                royality_data: args.royality_data,
                 service_royality,
                 taker: None,
-                nft_royalities: args.offered_resource.get_royality_data(),
-                owner: owner.clone(),
-                requested_resource: args.requested_resource,
-                requested_resource_vault: None,
-                offered_resource: AssetsAccumulator::new(args.offered_resource),
                 status: Status {
                     is_sold: false,
                     is_cancelled: false,
                     is_took: false,
                 },
+                vault: NonFungibleVault::with_bucket(args.asset),
+                xrd_vault: Vault::new(XRD),
             }
             .instantiate()
             .prepare_to_globalize(OwnerRole::None)
@@ -59,7 +59,7 @@ mod avago_swap_basic {
         pub fn exchange(
             &mut self,
             badge: NonFungibleLocalId,
-            mut required_assets: Assets,
+            required_assets: Assets,
         ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
             assert!(
                 !self.status.is_cancelled,
@@ -74,28 +74,33 @@ mod avago_swap_basic {
                 "Contract has already been bought by other."
             );
 
-            self.status.is_sold = true;
+            let mut xrd_bucket = required_assets
+                .fungible_buckets
+                .unwrap()
+                .into_iter()
+                .nth(0)
+                .unwrap();
 
-            let for_component_to_take = self
-                .requested_resource
-                .take_needed_assets(&mut required_assets);
-
-            let royality_data = self.nft_royalities.take().map_or(
-                for_component_to_take.get_royality_data(),
-                |mut f| {
-                    if let Some(x) = for_component_to_take.get_royality_data() {
-                        f.extend(x);
-                    }
-                    Some(f)
-                },
+            assert!(
+                xrd_bucket.resource_address() == XRD,
+                "Asset Forbiden, you must pay with XRD"
             );
 
-            self.requested_resource_vault = Some(AssetsAccumulator::new(for_component_to_take));
+            assert!(
+                xrd_bucket.amount() > self.price,
+                "You dont have enough XRD to buy"
+            );
+
+            self.status.is_sold = true;
+            self.xrd_vault.put(xrd_bucket.take(self.price).into());
             self.taker = Some(badge);
-            (
-                Some(vec![self.offered_resource.take(), required_assets]),
-                royality_data,
-            )
+
+            let asset_to_return = Assets {
+                non_fungible_buckets: Some(vec![self.vault.take_all()]),
+                fungible_buckets: Some(vec![xrd_bucket]),
+            };
+
+            (Some(vec![asset_to_return]), self.royality_data.to_owned())
         }
 
         pub fn withdraw_assets(
@@ -121,8 +126,14 @@ mod avago_swap_basic {
             );
 
             self.status.is_took = true;
+
+            let asset_to_return = Assets {
+                non_fungible_buckets: None,
+                fungible_buckets: Some(vec![self.xrd_vault.as_fungible().take_all()]),
+            };
+
             (
-                Some(vec![self.requested_resource_vault.as_mut().unwrap().take()]),
+                Some(vec![asset_to_return]),
                 Some(RoyalityData {
                     addresses: vec![],
                     amount: self.service_royality,
@@ -150,7 +161,12 @@ mod avago_swap_basic {
             );
 
             self.status.is_cancelled = true;
-            Some(vec![self.offered_resource.take()])
+            let to_return = Assets {
+                non_fungible_buckets: Some(vec![self.vault.take_all()]),
+                fungible_buckets: None,
+            };
+
+            Some(vec![to_return])
         }
     }
 }

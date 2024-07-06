@@ -2,7 +2,7 @@ use crate::common::*;
 use scrypto::prelude::*;
 
 #[blueprint]
-#[types(NonFungibleGlobalId, Decimal)]
+#[types(NonFungibleLocalId, Decimal)]
 mod avago_swap_bid {
 
     enable_method_auth! {
@@ -21,10 +21,10 @@ mod avago_swap_bid {
     struct AvagoSwapBid {
         id: u64,
         status: Status,
-        owner: NonFungibleGlobalId,
+        owner: NonFungibleLocalId,
         offered_resource: AssetsAccumulator,
         bids_vault: FungibleVault,
-        bidder: KeyValueStore<NonFungibleGlobalId, Decimal>,
+        bidder: KeyValueStore<NonFungibleLocalId, Decimal>,
         highest_bid: Option<HighestBidder>,
         nft_royalities: Option<RoyalityData>,
         service_royality: Decimal,
@@ -33,7 +33,7 @@ mod avago_swap_bid {
     impl AvagoSwapBid {
         pub fn instantiate(
             service_royality: Decimal,
-            owner: NonFungibleGlobalId,
+            owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u64,
             args: Args,
@@ -44,7 +44,7 @@ mod avago_swap_bid {
                 nft_royalities: args.offered_resource.get_royality_data(),
                 owner: owner.clone(),
                 bids_vault: FungibleVault::new(XRD),
-                bidder: KeyValueStore::<NonFungibleGlobalId, Decimal>::new_with_registered_type(),
+                bidder: KeyValueStore::<NonFungibleLocalId, Decimal>::new_with_registered_type(),
                 highest_bid: None,
                 offered_resource: AssetsAccumulator::new(args.offered_resource),
                 status: Status {
@@ -54,7 +54,7 @@ mod avago_swap_bid {
                 },
             }
             .instantiate()
-            .prepare_to_globalize(OwnerRole::Fixed(rule!(require(owner))))
+            .prepare_to_globalize(OwnerRole::None)
             .roles(roles! {
                 main => rule!(require(global_caller(main)));
             })
@@ -63,7 +63,7 @@ mod avago_swap_bid {
 
         pub fn exchange(
             &mut self,
-            owner: NonFungibleGlobalId,
+            owner: NonFungibleLocalId,
         ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
             assert!(
                 owner == self.owner,
@@ -96,7 +96,7 @@ mod avago_swap_bid {
             )
         }
 
-        pub fn cancel_escrow(&mut self, owner: NonFungibleGlobalId) -> Option<Vec<Assets>> {
+        pub fn cancel_escrow(&mut self, owner: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 owner == self.owner,
                 "You are not the owner of this contract swap."
@@ -115,7 +115,7 @@ mod avago_swap_bid {
         }
         pub fn bid(
             &mut self,
-            bidder: NonFungibleGlobalId,
+            bidder: NonFungibleLocalId,
             xrd_bucket: FungibleBucket,
         ) -> Option<Vec<Assets>> {
             assert!(
@@ -147,7 +147,7 @@ mod avago_swap_bid {
 
         pub fn withdraw_assets(
             &mut self,
-            bid_winner: NonFungibleGlobalId,
+            bid_winner: NonFungibleLocalId,
         ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
             assert!(
                 self.highest_bid.is_some(),
@@ -169,7 +169,7 @@ mod avago_swap_bid {
             )
         }
 
-        pub fn cancel_bid(&mut self, bidder: NonFungibleGlobalId) -> Option<Vec<Assets>> {
+        pub fn cancel_bid(&mut self, bidder: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 self.highest_bid.is_some(),
                 "No one has bid this contract yet."
@@ -198,6 +198,6 @@ pub struct Args {
 
 #[derive(ScryptoSbor)]
 pub struct HighestBidder {
-    pub non_fungible_global_id: NonFungibleGlobalId,
+    pub non_fungible_global_id: NonFungibleLocalId,
     pub amount: Decimal,
 }

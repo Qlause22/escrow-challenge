@@ -1,0 +1,20 @@
+CALL_METHOD
+  Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+  "lock_fee"
+  Decimal("5000")
+;
+
+
+CALL_METHOD
+    Address("component_sim1crmf90smj8c52m8r7nsrhvw9a93hxqsadjm09qtnq2paydv2dfvy4s")
+    "register"
+    Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+;
+
+
+CALL_METHOD
+    Address("account_sim1c956qr3kxlgypxwst89j9yf24tjc7zxd4up38x37zr6q4jxdx9rhma")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;

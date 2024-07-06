@@ -4,6 +4,7 @@ use scrypto::prelude::*;
 #[blueprint]
 #[types(AvagoBadge, ComponentAddress, Decimal)]
 mod avago_proxy {
+
     enable_method_auth! {
         methods {
             change_swap_style => restrict_to : [OWNER];
@@ -16,6 +17,7 @@ mod avago_proxy {
             pay_royality => PUBLIC;
             call_component_and_set_royality => PUBLIC;
             create_swap => PUBLIC;
+            create_multiple_swap => PUBLIC;
             claim_royality => PUBLIC;
         }
     }
@@ -39,22 +41,30 @@ mod avago_proxy {
                 Runtime::allocate_component_address(AvagoProxy::blueprint_id());
 
             let mut swap_style: HashMap<u8, BlueprintId> = HashMap::new();
+
             swap_style.insert(
                 1u8,
                 BlueprintId {
                     package_address: Runtime::package_address(),
-                    blueprint_name: String::from("AvagoSwapBasic"),
+                    blueprint_name: String::from("AvagoSwapSimple"),
                 },
             );
             swap_style.insert(
                 2u8,
                 BlueprintId {
                     package_address: Runtime::package_address(),
-                    blueprint_name: String::from("AvagoSwapBid"),
+                    blueprint_name: String::from("AvagoSwapBasic"),
                 },
             );
             swap_style.insert(
                 3u8,
+                BlueprintId {
+                    package_address: Runtime::package_address(),
+                    blueprint_name: String::from("AvagoSwapBid"),
+                },
+            );
+            swap_style.insert(
+                4u8,
                 BlueprintId {
                     package_address: Runtime::package_address(),
                     blueprint_name: String::from("AvagoSwapOffer"),
@@ -138,6 +148,7 @@ mod avago_proxy {
                     change_service_royality => Free, locked;
                     change_reward_address => Free, locked;
                     create_swap => Free, updatable;
+                    create_multiple_swap => Free, updatable;
                     pay_royality => Free, updatable;
                 }
             })
@@ -208,12 +219,14 @@ mod avago_proxy {
             style: u8,
             args: ScryptoValue,
         ) -> Global<AnyComponent> {
-            let global_id = proof
+            assert!(style != 0, "simple swap is not supported with this method");
+
+            let local_id = proof
                 .check_with_message(self.resource_manager.address(), "Invalid proof")
                 .as_non_fungible()
                 .non_fungible::<AvagoBadge>()
-                .global_id()
-                .to_owned();
+                .local_id()
+                .clone();
 
             self.increase_id(&style);
 
@@ -228,13 +241,68 @@ mod avago_proxy {
                 "instantiate",
                 scrypto_args!(
                     self.service_royality,
-                    global_id,
+                    local_id,
                     Runtime::global_address(),
                     self.get_current_id_of_style(&style),
                     args
                 ),
             ))
             .unwrap()
+        }
+
+        pub fn create_multiple_swap(
+            &mut self,
+            proof: Proof,
+            mut assets: NonFungibleBucket,
+            price: Decimal,
+        ) {
+            let local_id = proof
+                .check_with_message(self.resource_manager.address(), "Invalid proof")
+                .as_non_fungible()
+                .non_fungible::<AvagoBadge>()
+                .local_id()
+                .clone();
+
+            let BlueprintId {
+                package_address,
+                blueprint_name,
+            } = self.swap_style.get(&1u8).unwrap().to_owned();
+
+            let component_address: ComponentAddress = Runtime::global_address();
+
+            let royality_data: Option<RoyalityData> = assets
+                .resource_manager()
+                .get_metadata::<String, GlobalAddress>(String::from("ROYALITY"))
+                .unwrap_or(None)
+                .map(|global_address| RoyalityData {
+                    addresses: vec![Global::<Account>(Account {
+                        handle: ObjectStubHandle::Global(global_address),
+                    })
+                    .address()],
+                    amount: dec!("1"),
+                });
+
+            while !assets.is_empty() {
+                self.id.basic += 1;
+
+                ScryptoVmV1Api::blueprint_call(
+                    package_address,
+                    &blueprint_name,
+                    "instantiate",
+                    scrypto_args!(
+                        self.service_royality,
+                        &local_id,
+                        component_address,
+                        self.id.basic,
+                        ArgsSimpleSwap {
+                            price,
+                            royality_data: royality_data.clone(),
+                            asset: assets.take(1),
+                        }
+                    ),
+                );
+            }
+            assets.drop_empty();
         }
 
         pub fn call_component(
@@ -248,8 +316,8 @@ mod avago_proxy {
                 .check_with_message(self.resource_manager.address(), "Invalid proof")
                 .as_non_fungible()
                 .non_fungible::<AvagoBadge>()
-                .global_id()
-                .to_owned();
+                .local_id()
+                .clone();
 
             let scrypto_args = args.map_or(scrypto_args!(global_id.clone()), |arg| {
                 scrypto_args!(global_id, arg)
@@ -274,7 +342,7 @@ mod avago_proxy {
                 .check_with_message(self.resource_manager.address(), "Invalid proof")
                 .as_non_fungible()
                 .non_fungible::<AvagoBadge>()
-                .global_id()
+                .local_id()
                 .to_owned();
 
             let scrypto_args = args.map_or(scrypto_args!(global_id.clone()), |arg| {
