@@ -1,0 +1,35 @@
+CALL_METHOD
+  Address("${account_1}")
+  "lock_fee"
+  Decimal("5000")
+;
+
+CALL_METHOD
+    Address("${account_1}")
+    "create_proof_of_non_fungibles"
+    Address("${badge}")
+    Array<NonFungibleLocalId>(
+        NonFungibleLocalId("${id}")
+    )
+;
+
+POP_FROM_AUTH_ZONE
+    Proof("nft_proof")
+;
+
+CALL_METHOD
+  Address("${escrow_component}")
+  "call_component"
+  Proof("nft_proof")
+  Address("${swap_contract}")
+  "cancel_escrow"
+  None
+;
+
+CALL_METHOD
+    Address("${account_1}")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;
+

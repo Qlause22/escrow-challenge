@@ -1,0 +1,30 @@
+CALL_METHOD
+    Address("${account_1}")
+    "lock_fee"
+    Decimal("5000")
+;
+
+CALL_METHOD
+    Address("${account_1}")
+    "withdraw"
+    Address("${ft_resource_2}")
+    Decimal("100")
+;
+
+CALL_METHOD
+    Address("${account_1}")
+    "withdraw_non_fungibles"
+    Address("${nft_resource_2}")
+    Array<NonFungibleLocalId>(
+        NonFungibleLocalId("#1#"),
+        NonFungibleLocalId("#2#"),
+        NonFungibleLocalId("#3#")
+    )
+;
+
+CALL_METHOD
+    Address("${account_2}")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;

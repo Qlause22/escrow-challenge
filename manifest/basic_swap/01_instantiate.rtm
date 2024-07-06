@@ -6,8 +6,8 @@ CALL_METHOD
 
 CALL_FUNCTION 
   Address("${escrow_package_address}") 
-  "EscrowProxy" 
+  "AvagoProxy" 
   "instantiate_proxy"
-  None
+  NonFungibleGlobalId("${owner}")
 ;
 

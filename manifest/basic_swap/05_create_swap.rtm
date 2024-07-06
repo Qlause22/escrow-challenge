@@ -5,6 +5,20 @@ CALL_METHOD
 ;
 
 CALL_METHOD
+    Address("${account_1}")
+    "create_proof_of_non_fungibles"
+    Address("${badge}")
+    Array<NonFungibleLocalId>(
+        NonFungibleLocalId("${id}")
+    )
+;
+
+POP_FROM_AUTH_ZONE
+    Proof("nft_proof")
+;
+
+
+CALL_METHOD
   Address("${account_1}")
   "withdraw"
   Address("resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3")
@@ -55,6 +69,8 @@ TAKE_NON_FUNGIBLES_FROM_WORKTOP
 CALL_METHOD
   Address("${escrow_component}")
   "create_swap"
+  Proof("nft_proof")
+  1u8
   Tuple(
     Tuple(
       Some(

@@ -1,0 +1,51 @@
+CALL_METHOD
+  Address("${account_1}")
+  "lock_fee"
+  Decimal("1000")
+;
+
+CALL_METHOD
+  Address("${account_1}")
+  "withdraw"
+  Address("resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3")
+  Decimal("${amount}")  
+;
+
+TAKE_FROM_WORKTOP
+  Address("resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3")
+  Decimal("${amount}")
+  Bucket("bucket1")
+;
+
+
+CALL_METHOD
+    Address("${account_1}")
+    "create_proof_of_non_fungibles"
+    Address("${badge}")
+    Array<NonFungibleLocalId>(
+        NonFungibleLocalId("${id}")
+    )
+;
+
+POP_FROM_AUTH_ZONE
+    Proof("nft_proof")
+;
+
+CALL_METHOD
+  Address("${escrow_component}")
+  "call_component"
+  Proof("nft_proof")
+  Address("${swap_contract}")
+  "bid"
+  Some(
+    Bucket("bucket1")
+  )
+;
+
+CALL_METHOD
+    Address("${account_1}")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;
+

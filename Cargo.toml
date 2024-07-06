@@ -1,20 +1,20 @@
 [package]
-name = "escrow-exercise-boilerplate"
+name = "avago"
 version = "1.0.0"
 edition = "2021"
 resolver = "2"
 
 [dependencies]
-sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.2" }
+scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.2" }
 
 [dev-dependencies]
-transaction = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-radix-engine = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-scrypto-unit = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-scrypto-test = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-radix-engine-interface = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-escrow-exercise-boilerplate = { path = ".", features = ["test"] }
+transaction = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.2" }
+radix-engine = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.2" }
+scrypto-unit = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.2" }
+scrypto-test = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.2" }
+radix-engine-interface = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.2" }
+avago = { path = "." }
 
 [profile.release]
 opt-level = 'z'        # Optimize for size.
@@ -26,7 +26,7 @@ overflow-checks = true # Panic in the case of an overflow.
 
 [features]
 default = []
-test = []
+avago = []
 
 [lib]
 crate-type = ["cdylib", "lib"]

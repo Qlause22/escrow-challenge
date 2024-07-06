@@ -1,0 +1,20 @@
+CALL_METHOD
+  Address("${account_1}")
+  "lock_fee"
+  Decimal("5000")
+;
+
+
+CALL_METHOD
+    Address("${escrow_component}")
+    "register"
+    Address("${account_1}")
+;
+
+
+CALL_METHOD
+    Address("${account_1}")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;

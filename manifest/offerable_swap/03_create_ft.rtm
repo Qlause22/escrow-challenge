@@ -1,0 +1,30 @@
+CALL_METHOD
+    Address("${account_1}")
+    "lock_fee"
+    Decimal("5000")
+;
+CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
+    Enum<0u8>()
+    true
+    18u8
+    Decimal("100")
+    Tuple(
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>(),
+        Enum<0u8>()
+    )
+    Tuple(
+        Map<String, Tuple>(),
+        Map<String, Enum>()
+    )
+    Enum<0u8>()
+;
+CALL_METHOD
+    Address("${account_1}")
+    "try_deposit_batch_or_abort"
+    Expression("ENTIRE_WORKTOP")
+    Enum<0u8>()
+;
