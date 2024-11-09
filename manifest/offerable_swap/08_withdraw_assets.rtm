@@ -19,23 +19,11 @@ POP_FROM_AUTH_ZONE
 
 CALL_METHOD
   Address("${escrow_component}")
-  "call_component_and_set_royality"
+  "call_component"
   Proof("nft_proof")
   Address("${swap_contract}")
   "withdraw_assets"
   None
-;
-
-TAKE_FROM_WORKTOP
-  Address("${ticket}")
-  Decimal("1")
-  Bucket("ticket")
-;
-
-CALL_METHOD
-  Address("${escrow_component}")
-  "pay_royality"
-  Bucket("ticket")
 ;
 
 CALL_METHOD

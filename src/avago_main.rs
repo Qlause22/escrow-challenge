@@ -14,11 +14,8 @@ mod avago_proxy {
             register => PUBLIC;
             unregister => PUBLIC;
             call_component => PUBLIC;
-            pay_royality => PUBLIC;
-            call_component_and_set_royality => PUBLIC;
             create_swap => PUBLIC;
             create_multiple_swap => PUBLIC;
-            claim_royality => PUBLIC;
         }
     }
     struct AvagoProxy {
@@ -27,10 +24,7 @@ mod avago_proxy {
         resource_manager: ResourceManager,
         swap_style: HashMap<u8, BlueprintId>,
         users: KeyValueStore<ComponentAddress, ()>,
-        royality_list: KeyValueStore<ComponentAddress, Decimal>,
-        id: ID,
-        ticket: ResourceManager,
-        transient_royality_data: Option<RoyalityData>,
+        id: Ids,
         reward_address: Option<ComponentAddress>,
     }
 
@@ -70,6 +64,13 @@ mod avago_proxy {
                     blueprint_name: String::from("AvagoSwapOffer"),
                 },
             );
+            swap_style.insert(
+                5u8,
+                BlueprintId {
+                    package_address: Runtime::package_address(),
+                    blueprint_name: String::from("AvagoSwapP2P"),
+                },
+            );
 
             Self {
                 xrd_vault: FungibleVault::new(XRD),
@@ -95,35 +96,8 @@ mod avago_proxy {
                 })
                 .create_with_no_initial_supply(),
                 users: KeyValueStore::new(),
-                royality_list: KeyValueStore::<ComponentAddress, Decimal>::new_with_registered_type(
-                ),
-                ticket: ResourceBuilder::new_fungible(owner.clone())
-                    .divisibility(DIVISIBILITY_NONE)
-                    .mint_roles(mint_roles! {
-                        minter => rule!(require(global_caller(component_address)));
-                        minter_updater => rule!(deny_all);
-                    })
-                    .burn_roles(burn_roles! {
-                        burner => rule!(require(global_caller(component_address)));
-                        burner_updater => rule!(deny_all);
-                    })
-                    .deposit_roles(deposit_roles! {
-                        depositor => rule!(deny_all);
-                        depositor_updater => rule!(deny_all);
-                    })
-                    .withdraw_roles(withdraw_roles! {
-                        withdrawer => rule!(deny_all);
-                        withdrawer_updater => rule!(deny_all);
-                    })
-                    .create_with_no_initial_supply(),
                 reward_address: None,
-                transient_royality_data: None,
-                id: ID {
-                    member: 0u64,
-                    basic: 0u64,
-                    bid: 0u64,
-                    offer: 0u64,
-                },
+                id: Ids::new(),
                 swap_style,
             }
             .instantiate()
@@ -142,14 +116,11 @@ mod avago_proxy {
                     register => Free, locked;
                     unregister => Free, locked;
                     call_component => Free, locked;
-                    call_component_and_set_royality => Free, locked;
-                    claim_royality => Free, locked;
                     claim_custom_royality => Free, locked;
                     change_service_royality => Free, locked;
                     change_reward_address => Free, locked;
                     create_swap => Free, updatable;
                     create_multiple_swap => Free, updatable;
-                    pay_royality => Free, updatable;
                 }
             })
             .with_address(address_reservation)
@@ -228,7 +199,7 @@ mod avago_proxy {
                 .local_id()
                 .clone();
 
-            self.increase_id(&style);
+            self.id.swap += 1u128;
 
             let BlueprintId {
                 package_address,
@@ -243,7 +214,7 @@ mod avago_proxy {
                     self.service_royality,
                     local_id,
                     Runtime::global_address(),
-                    self.get_current_id_of_style(&style),
+                    self.id.swap,
                     args
                 ),
             ))
@@ -270,20 +241,8 @@ mod avago_proxy {
 
             let component_address: ComponentAddress = Runtime::global_address();
 
-            let royality_data: Option<RoyalityData> = assets
-                .resource_manager()
-                .get_metadata::<String, GlobalAddress>(String::from("ROYALITY"))
-                .unwrap_or(None)
-                .map(|global_address| RoyalityData {
-                    addresses: vec![Global::<Account>(Account {
-                        handle: ObjectStubHandle::Global(global_address),
-                    })
-                    .address()],
-                    amount: dec!("1"),
-                });
-
             while !assets.is_empty() {
-                self.id.basic += 1;
+                self.id.swap += 1u128;
 
                 ScryptoVmV1Api::blueprint_call(
                     package_address,
@@ -293,10 +252,9 @@ mod avago_proxy {
                         self.service_royality,
                         &local_id,
                         component_address,
-                        self.id.basic,
+                        self.id.swap,
                         ArgsSimpleSwap {
                             price,
-                            royality_data: royality_data.clone(),
                             asset: assets.take(1),
                         }
                     ),
@@ -312,15 +270,15 @@ mod avago_proxy {
             method: String,
             args: Option<ScryptoValue>,
         ) -> Option<Vec<Assets>> {
-            let global_id = proof
+            let local_id = proof
                 .check_with_message(self.resource_manager.address(), "Invalid proof")
                 .as_non_fungible()
                 .non_fungible::<AvagoBadge>()
                 .local_id()
                 .clone();
 
-            let scrypto_args = args.map_or(scrypto_args!(global_id.clone()), |arg| {
-                scrypto_args!(global_id, arg)
+            let scrypto_args = args.map_or(scrypto_args!(local_id.clone()), |arg| {
+                scrypto_args!(local_id, arg)
             });
 
             scrypto_decode(&ScryptoVmV1Api::object_call(
@@ -329,111 +287,6 @@ mod avago_proxy {
                 scrypto_args,
             ))
             .unwrap()
-        }
-
-        pub fn call_component_and_set_royality(
-            &mut self,
-            proof: Proof,
-            component_address: ComponentAddress,
-            method: String,
-            args: Option<ScryptoValue>,
-        ) -> (Option<Vec<Assets>>, Bucket) {
-            let global_id = proof
-                .check_with_message(self.resource_manager.address(), "Invalid proof")
-                .as_non_fungible()
-                .non_fungible::<AvagoBadge>()
-                .local_id()
-                .to_owned();
-
-            let scrypto_args = args.map_or(scrypto_args!(global_id.clone()), |arg| {
-                scrypto_args!(global_id, arg)
-            });
-
-            let (assets, royality_data): (Option<Vec<Assets>>, Option<RoyalityData>) =
-                scrypto_decode(&ScryptoVmV1Api::object_call(
-                    component_address.as_node_id(),
-                    method.as_str(),
-                    scrypto_args,
-                ))
-                .unwrap();
-
-            match royality_data {
-                Some(royality_data) => {
-                    Runtime::global_component().set_royalty(
-                        String::from("pay_royality"),
-                        RoyaltyAmount::Xrd(royality_data.amount),
-                    );
-                    self.transient_royality_data = Some(royality_data);
-                }
-                None => {
-                    Runtime::global_component()
-                        .set_royalty(String::from("pay_royality"), RoyaltyAmount::Xrd(dec!(0)));
-                    self.transient_royality_data = None;
-                }
-            };
-
-            (assets, self.ticket.mint(1))
-        }
-
-        pub fn pay_royality(&mut self, ticket: Bucket) -> Option<Assets> {
-            assert!(
-                ticket.resource_address() == self.ticket.address(),
-                "invalid ticket"
-            );
-
-            match self.transient_royality_data.as_ref() {
-                Some(royality_data) => {
-                    royality_data
-                        .addresses
-                        .iter()
-                        .for_each(|component_address| {
-                            if self.royality_list.get(component_address).is_some() {
-                                *self.royality_list.get_mut(component_address).unwrap() += dec!(1);
-                            } else {
-                                self.royality_list.insert(*component_address, dec!(1));
-                            }
-                        });
-                }
-                None => {
-                    Runtime::global_component()
-                        .set_royalty(String::from("pay_royality"), RoyaltyAmount::Xrd(dec!(0)));
-                }
-            }
-
-            let reward: Option<Assets> = if let Some(reward_address) = self.reward_address {
-                scrypto_decode(&ScryptoVmV1Api::object_call(
-                    reward_address.as_node_id(),
-                    "claim_reward",
-                    scrypto_args!(),
-                ))
-                .unwrap()
-            } else {
-                None
-            };
-
-            self.transient_royality_data = None;
-            ticket.burn();
-            reward
-        }
-
-        pub fn claim_royality(&mut self, proof: Proof) -> FungibleBucket {
-            let nft_data = proof
-                .check_with_message(self.resource_manager.address(), "Invalid proof")
-                .as_non_fungible()
-                .non_fungible::<AvagoBadge>()
-                .data();
-
-            match self.royality_list.remove(&nft_data.owner) {
-                Some(amount) => {
-                    self.xrd_vault.put(
-                        Runtime::global_component()
-                            .claim_component_royalties()
-                            .as_fungible(),
-                    );
-                    self.xrd_vault.take(amount)
-                }
-                None => Runtime::panic(String::from("You dont have royalties")),
-            }
         }
 
         pub fn claim_custom_royality(&mut self, amount: Decimal) -> FungibleBucket {
@@ -452,31 +305,20 @@ mod avago_proxy {
         pub fn change_reward_address(&mut self, address: Option<ComponentAddress>) {
             self.reward_address = address;
         }
-
-        fn increase_id(&mut self, style: &u8) {
-            match style {
-                1u8 => self.id.basic += 1u64,
-                2u8 => self.id.bid += 1u64,
-                3u8 => self.id.offer += 1u64,
-                _ => Runtime::panic(String::from("Invalid style")),
-            }
-        }
-
-        fn get_current_id_of_style(&self, style: &u8) -> u64 {
-            match style {
-                1u8 => self.id.basic,
-                2u8 => self.id.bid,
-                3u8 => self.id.offer,
-                _ => Runtime::panic(String::from("Invalid style")),
-            }
-        }
     }
 }
 
 #[derive(ScryptoSbor)]
-struct ID {
+pub struct Ids {
     member: u64,
-    basic: u64,
-    bid: u64,
-    offer: u64,
+    swap: u128,
+}
+
+impl Ids {
+    pub fn new() -> Self {
+        Self {
+            member: 0u64,
+            swap: 0u128,
+        }
+    }
 }

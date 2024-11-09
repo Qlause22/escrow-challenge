@@ -70,7 +70,7 @@ CALL_METHOD
   Address("${escrow_component}")
   "create_swap"
   Proof("nft_proof")
-  1u8
+  2u8
   Tuple(
     Tuple(
       Some(

@@ -6,52 +6,6 @@ pub struct Assets {
     pub non_fungible_buckets: Option<Vec<NonFungibleBucket>>,
 }
 
-impl Assets {
-    pub fn get_royality_data(&self) -> Option<RoyalityData> {
-        let mut to_return: Option<Vec<ComponentAddress>> = None;
-
-        self.non_fungible_buckets
-            .as_ref()
-            .into_iter()
-            .for_each(|nft_buckets| {
-                nft_buckets.iter().for_each(|nft_bucket| {
-                    if let Some(global_address) = nft_bucket
-                        .resource_manager()
-                        .get_metadata::<String, GlobalAddress>(String::from("ROYALITY"))
-                        .unwrap_or(None)
-                    {
-                        let claimer = Global::<Account>(Account {
-                            handle: ObjectStubHandle::Global(global_address),
-                        })
-                        .address();
-
-                        match to_return.as_mut() {
-                            Some(val) => val.push(claimer),
-                            None => to_return = Some(vec![claimer]),
-                        }
-                    }
-                })
-            });
-
-        to_return.map(|royality| RoyalityData {
-            amount: Decimal::from_str(&royality.len().to_string()).unwrap(),
-            addresses: royality,
-        })
-    }
-}
-
-#[derive(ScryptoSbor, Clone)]
-pub struct RoyalityData {
-    pub addresses: Vec<ComponentAddress>,
-    pub amount: Decimal,
-}
-
-impl RoyalityData {
-    pub fn extend(&mut self, royality_data: RoyalityData) {
-        self.addresses.extend(royality_data.addresses);
-        self.amount += royality_data.amount;
-    }
-}
 #[derive(ScryptoSbor, NonFungibleData)]
 pub struct AvagoBadge {
     pub owner: ComponentAddress,
@@ -199,5 +153,4 @@ pub struct Args {
 pub struct ArgsSimpleSwap {
     pub asset: NonFungibleBucket,
     pub price: Decimal,
-    pub royality_data: Option<RoyalityData>,
 }

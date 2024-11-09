@@ -31,7 +31,6 @@ output=$(account_1=${account_address_1} \
   resim run manifest/basic_swap/01_instantiate.rtm)
 escrow_component_1=$(echo "$output" | grep "Component:" | grep -o "component_.*")
 escrow_badge_1=$(echo "$output" | grep "Resource:" | grep -o "resource_.*" | sed -n '1p')
-ticket=$(echo "$output" | grep "Resource:" | grep -o "resource_.*" | sed -n '2p')
 resim show $escrow_component_1
 resim show $escrow_badge_1
 
@@ -122,7 +121,6 @@ resim show $swap_component_1
 
 echo -e "\n12. Withdrawing assets (error intended)."
 output=$(account_1=${account_address_1} \
-  ticket=${ticket} \
   escrow_component=${escrow_component_1} \
   badge=${escrow_badge_1} \
   id="#1#" \
@@ -146,7 +144,6 @@ output=$(account_2=${account_address_2} \
   nft_resource_2=${nft_resource_address_2} \
   ft_resource_2=${ft_resource_address_2} \
   swap_contract=${swap_component_1} \
-  ticket=${ticket} \
   resim run manifest/basic_swap/08_exchange_assets.rtm)
 
 echo "$output" 
@@ -159,7 +156,6 @@ resim set-default-account $account_address_1 $private_key_1 $owner_badge_1":"$ow
 echo -e "\n17. Withdrawing Assets."
 
 output=$(account_1=${account_address_1} \
-  ticket=${ticket} \
   escrow_component=${escrow_component_1} \
   badge=${escrow_badge_1} \
   id="#1#" \
@@ -203,7 +199,6 @@ output=$(account_1=${account_address_1} \
   resim run manifest/bidable_swap/01_instantiate.rtm)
 escrow_component_1=$(echo "$output" | grep "Component:" | grep -o "component_.*")
 escrow_badge_1=$(echo "$output" | grep "Resource:" | grep -o "resource_.*" | sed -n '1p')
-ticket=$(echo "$output" | grep "Resource:" | grep -o "resource_.*" | sed -n '2p')
 resim show $escrow_component_1
 resim show $escrow_badge_1
 
@@ -312,7 +307,6 @@ resim show $swap_component_1
 
 echo -e "\n13. Withdrawing assets (error intended)."
 output=$(account_1=${account_address_1} \
-  ticket=${ticket} \
   escrow_component=${escrow_component_1} \
   badge=${escrow_badge_1} \
   id="#1#" \
@@ -329,7 +323,6 @@ output=$(account_1=${account_address_2} \
   id="#2#" \
   swap_contract=${swap_component_1} \
   amount="10" \
-  ticket=${ticket} \
   resim run manifest/bidable_swap/09_bid_contract.rtm | grep -o "Transaction.*")
 
 echo "$output" 
@@ -344,7 +337,6 @@ output=$(account_1=${account_address_3} \
   id="#3#" \
   amount="5" \
   swap_contract=${swap_component_1} \
-  ticket=${ticket} \
   resim run manifest/bidable_swap/09_bid_contract.rtm | grep -o "Transaction.*" || true)
 
 echo "$output" 
@@ -360,7 +352,6 @@ output=$(account_1=${account_address_4} \
   id="#4#" \
   amount="30" \
   swap_contract=${swap_component_1} \
-  ticket=${ticket} \
   resim run manifest/bidable_swap/09_bid_contract.rtm | grep -o "Transaction.*")
 
 echo "$output" 
@@ -377,7 +368,6 @@ output=$(account_1=${account_address_1} \
   nft_resource_2=${nft_resource_address_2} \
   ft_resource_2=${ft_resource_address_2} \
   swap_contract=${swap_component_1} \
-  ticket=${ticket} \
   resim run manifest/bidable_swap/08_exchange_assets.rtm)
 
 echo "$output" 
@@ -390,7 +380,6 @@ resim set-default-account $account_address_4 $private_key_4 $owner_badge_4":"$ow
 echo -e "\n23. Withdrawing Assets."
 
 output=$(account_1=${account_address_4} \
-  ticket=${ticket} \
   escrow_component=${escrow_component_1} \
   badge=${escrow_badge_1} \
   id="#4#" \
@@ -435,7 +424,6 @@ output=$(account_1=${account_address_1} \
   resim run manifest/offerable_swap/01_instantiate.rtm)
 escrow_component_1=$(echo "$output" | grep "Component:" | grep -o "component_.*")
 escrow_badge_1=$(echo "$output" | grep "Resource:" | grep -o "resource_.*" | sed -n '1p')
-ticket=$(echo "$output" | grep "Resource:" | grep -o "resource_.*" | sed -n '2p')
 resim show $escrow_component_1
 resim show $escrow_badge_1
 
@@ -537,7 +525,6 @@ output=$(account_2=${account_address_2} \
   nft_resource_2=${nft_resource_address_2} \
   ft_resource_2=${ft_resource_address_2} \
   swap_contract=${swap_component_1} \
-  ticket=${ticket} \
   resim run manifest/offerable_swap/09_offer_contract.rtm)
 
 echo "$output" 
@@ -550,7 +537,6 @@ resim set-default-account $account_address_1 $private_key_1 $owner_badge_1":"$ow
 echo -e "\n16. Exchange Assets."
 
 output=$(account_1=${account_address_1} \
-  ticket=${ticket} \
   escrow_component=${escrow_component_1} \
   badge=${escrow_badge_1} \
   id="#1#" \
@@ -567,7 +553,6 @@ resim set-default-account $account_address_2 $private_key_2 $owner_badge_2":"$ow
 echo -e "\n18. Withdraw Assets."
 
 output=$(account_1=${account_address_2} \
-  ticket=${ticket} \
   escrow_component=${escrow_component_1} \
   badge=${escrow_badge_1} \
   id="#2#" \

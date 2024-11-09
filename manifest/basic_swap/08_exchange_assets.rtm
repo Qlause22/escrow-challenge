@@ -67,7 +67,7 @@ TAKE_NON_FUNGIBLES_FROM_WORKTOP
 
 CALL_METHOD
   Address("${escrow_component}")
-  "call_component_and_set_royality"
+  "call_component"
   Proof("nft_proof")
   Address("${swap_contract}")
   "exchange"
@@ -86,18 +86,6 @@ CALL_METHOD
       )
     )
   )
-;
-
-TAKE_FROM_WORKTOP
-  Address("${ticket}")
-  Decimal("1")
-  Bucket("ticket")
-;
-
-CALL_METHOD
-    Address("${escrow_component}")
-    "pay_royality"
-    Bucket("ticket")
 ;
 
 CALL_METHOD

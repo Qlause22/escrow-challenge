@@ -19,14 +19,13 @@ mod avago_swap_bid {
     }
 
     struct AvagoSwapBid {
-        id: u64,
+        id: u128,
         status: Status,
         owner: NonFungibleLocalId,
         offered_resource: AssetsAccumulator,
         bids_vault: FungibleVault,
         bidder: KeyValueStore<NonFungibleLocalId, Decimal>,
         highest_bid: Option<HighestBidder>,
-        nft_royalities: Option<RoyalityData>,
         service_royality: Decimal,
     }
 
@@ -35,13 +34,12 @@ mod avago_swap_bid {
             service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
-            id: u64,
+            id: u128,
             args: Args,
         ) -> Global<AvagoSwapBid> {
             Self {
                 id,
                 service_royality,
-                nft_royalities: args.offered_resource.get_royality_data(),
                 owner: owner.clone(),
                 bids_vault: FungibleVault::new(XRD),
                 bidder: KeyValueStore::<NonFungibleLocalId, Decimal>::new_with_registered_type(),
@@ -61,10 +59,7 @@ mod avago_swap_bid {
             .globalize()
         }
 
-        pub fn exchange(
-            &mut self,
-            owner: NonFungibleLocalId,
-        ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
+        pub fn exchange(&mut self, owner: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 owner == self.owner,
                 "You are not the owner of this contract swap."
@@ -80,22 +75,15 @@ mod avago_swap_bid {
 
             self.status.is_sold = true;
 
-            (
-                Some(vec![Assets {
-                    fungible_buckets: Some(vec![self
-                        .highest_bid
-                        .as_mut()
-                        .map(|bidder| self.bids_vault.take(bidder.amount))
-                        .unwrap()]),
-                    non_fungible_buckets: None,
-                }]),
-                Some(RoyalityData {
-                    addresses: vec![],
-                    amount: self.service_royality,
-                }),
-            )
+            Some(vec![Assets {
+                fungible_buckets: Some(vec![self
+                    .highest_bid
+                    .as_mut()
+                    .map(|bidder| self.bids_vault.take(bidder.amount))
+                    .unwrap()]),
+                non_fungible_buckets: None,
+            }])
         }
-
         pub fn cancel_escrow(&mut self, owner: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 owner == self.owner,
@@ -145,10 +133,7 @@ mod avago_swap_bid {
             None
         }
 
-        pub fn withdraw_assets(
-            &mut self,
-            bid_winner: NonFungibleLocalId,
-        ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
+        pub fn withdraw_assets(&mut self, bid_winner: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 self.highest_bid.is_some(),
                 "No one has bid this contract yet."
@@ -163,10 +148,7 @@ mod avago_swap_bid {
             );
 
             self.status.is_took = true;
-            (
-                Some(vec![self.offered_resource.take()]),
-                self.nft_royalities.take(),
-            )
+            Some(vec![self.offered_resource.take()])
         }
 
         pub fn cancel_bid(&mut self, bidder: NonFungibleLocalId) -> Option<Vec<Assets>> {

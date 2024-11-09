@@ -2,7 +2,7 @@ use crate::common::*;
 use scrypto::prelude::*;
 
 #[blueprint]
-mod avago_swap_basic {
+mod avago_swap_p2p {
     enable_method_auth! {
         roles {
             main => updatable_by: [];
@@ -13,29 +13,29 @@ mod avago_swap_basic {
             cancel_escrow => restrict_to: [main];
         }
     }
-    struct AvagoSwapBasic {
+    struct AvagoSwapP2P {
         id: u128,
         service_royality: Decimal,
         status: Status,
         owner: NonFungibleLocalId,
-        taker: Option<NonFungibleLocalId>,
+        taker: NonFungibleLocalId,
         offered_resource: AssetsAccumulator,
         requested_resource: RequiredResources,
         requested_resource_vault: Option<AssetsAccumulator>,
     }
 
-    impl AvagoSwapBasic {
+    impl AvagoSwapP2P {
         pub fn instantiate(
             service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u128,
-            args: Args,
-        ) -> Global<AvagoSwapBasic> {
+            args: ArgsP2P,
+        ) -> Global<AvagoSwapP2P> {
             Self {
                 id,
                 service_royality,
-                taker: None,
+                taker: args.taker,
                 owner: owner.clone(),
                 requested_resource: args.requested_resource,
                 requested_resource_vault: None,
@@ -60,6 +60,10 @@ mod avago_swap_basic {
             mut required_assets: Assets,
         ) -> Option<Vec<Assets>> {
             assert!(
+                self.taker == badge,
+                "Your id have no access to this contract."
+            );
+            assert!(
                 !self.status.is_cancelled,
                 "Contract has already been cancelled."
             );
@@ -79,7 +83,6 @@ mod avago_swap_basic {
                 .take_needed_assets(&mut required_assets);
 
             self.requested_resource_vault = Some(AssetsAccumulator::new(for_component_to_take));
-            self.taker = Some(badge);
             Some(vec![self.offered_resource.take(), required_assets])
         }
 
@@ -88,7 +91,6 @@ mod avago_swap_basic {
                 badge == self.owner,
                 "You are not the owner and not allowed to withdraw"
             );
-
             assert!(
                 self.status.is_sold,
                 "Contract hasn't already been sold by other."
@@ -103,7 +105,6 @@ mod avago_swap_basic {
             );
 
             self.status.is_took = true;
-
             Some(vec![self.requested_resource_vault.as_mut().unwrap().take()])
         }
 
@@ -130,4 +131,11 @@ mod avago_swap_basic {
             Some(vec![self.offered_resource.take()])
         }
     }
+}
+
+#[derive(ScryptoSbor)]
+pub struct ArgsP2P {
+    offered_resource: Assets,
+    requested_resource: RequiredResources,
+    taker: NonFungibleLocalId,
 }

@@ -19,13 +19,12 @@ mod avago_swap_bid {
     }
 
     struct AvagoSwapOffer {
-        id: u64,
+        id: u128,
         status: Status,
         owner: NonFungibleLocalId,
         offered_resource: AssetsAccumulator,
         offers: KeyValueStore<NonFungibleLocalId, AssetsAccumulator>,
         selected: Option<NonFungibleLocalId>,
-        nft_royalities: Option<RoyalityData>,
         service_royality: Decimal,
     }
 
@@ -34,13 +33,12 @@ mod avago_swap_bid {
             service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
-            id: u64,
+            id: u128,
             args: Args,
         ) -> Global<AvagoSwapOffer> {
             Self {
                 id,
                 service_royality,
-                nft_royalities: args.offered_resource.get_royality_data(),
                 owner: owner.clone(),
                 offers: KeyValueStore::<NonFungibleLocalId, AssetsAccumulator>::new_with_registered_type(),
                 offered_resource: AssetsAccumulator::new(args.offered_resource),
@@ -59,11 +57,7 @@ mod avago_swap_bid {
             .globalize()
         }
 
-        pub fn exchange(
-            &mut self,
-            owner: NonFungibleLocalId,
-            selected: NonFungibleLocalId,
-        ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
+        pub fn exchange(&mut self, owner: NonFungibleLocalId, args: Args2) -> Option<Vec<Assets>> {
             assert!(
                 owner == self.owner,
                 "You are not the owner of this contract swap."
@@ -82,26 +76,10 @@ mod avago_swap_bid {
             );
 
             self.status.is_sold = true;
-            self.selected = Some(selected.clone());
+            self.selected = Some(args.selected.local_id().clone());
 
-            if let Some(mut assets) = self.offers.get_mut(&selected) {
-                let assets = assets.take();
-                self.nft_royalities =
-                    self.nft_royalities
-                        .take()
-                        .map_or(assets.get_royality_data(), |mut f| {
-                            if let Some(x) = assets.get_royality_data() {
-                                f.extend(x);
-                            }
-                            Some(f)
-                        });
-                (
-                    Some(vec![assets]),
-                    Some(RoyalityData {
-                        addresses: vec![],
-                        amount: self.service_royality,
-                    }),
-                )
+            if let Some(mut assets) = self.offers.get_mut(args.selected.local_id()) {
+                Some(vec![assets.take()])
             } else {
                 Runtime::panic(String::from("Selected offers is not available."))
             }
@@ -148,10 +126,7 @@ mod avago_swap_bid {
             None
         }
 
-        pub fn withdraw_assets(
-            &mut self,
-            offer_winner: NonFungibleLocalId,
-        ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
+        pub fn withdraw_assets(&mut self, offer_winner: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 self.selected.is_some(),
                 "The owner is not selected the offer contract yet."
@@ -174,10 +149,7 @@ mod avago_swap_bid {
             );
 
             self.status.is_took = true;
-            (
-                Some(vec![self.offered_resource.take()]),
-                self.nft_royalities.take(),
-            )
+            Some(vec![self.offered_resource.take()])
         }
 
         pub fn cancel_offer(&mut self, offerer: NonFungibleLocalId) -> Option<Vec<Assets>> {
@@ -202,4 +174,9 @@ mod avago_swap_bid {
 #[derive(ScryptoSbor)]
 pub struct Args {
     pub offered_resource: Assets,
+}
+
+#[derive(ScryptoSbor)]
+pub struct Args2 {
+    pub selected: NonFungibleGlobalId,
 }

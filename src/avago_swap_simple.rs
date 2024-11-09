@@ -14,12 +14,11 @@ mod simple_contract {
         }
     }
     struct AvagoSwapSimple {
-        id: u64,
+        id: u128,
         vault: NonFungibleVault,
         service_royality: Decimal,
         owner: NonFungibleLocalId,
         taker: Option<NonFungibleLocalId>,
-        royality_data: Option<RoyalityData>,
         status: Status,
         price: Decimal,
         xrd_vault: Vault,
@@ -30,14 +29,13 @@ mod simple_contract {
             service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
-            id: u64,
+            id: u128,
             args: ArgsSimpleSwap,
         ) -> Global<AvagoSwapSimple> {
             Self {
                 id,
                 owner,
                 price: args.price,
-                royality_data: args.royality_data,
                 service_royality,
                 taker: None,
                 status: Status {
@@ -60,7 +58,7 @@ mod simple_contract {
             &mut self,
             badge: NonFungibleLocalId,
             required_assets: Assets,
-        ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
+        ) -> Option<Vec<Assets>> {
             assert!(
                 !self.status.is_cancelled,
                 "Contract has already been cancelled."
@@ -100,13 +98,10 @@ mod simple_contract {
                 fungible_buckets: Some(vec![xrd_bucket]),
             };
 
-            (Some(vec![asset_to_return]), self.royality_data.to_owned())
+            Some(vec![asset_to_return])
         }
 
-        pub fn withdraw_assets(
-            &mut self,
-            badge: NonFungibleLocalId,
-        ) -> (Option<Vec<Assets>>, Option<RoyalityData>) {
+        pub fn withdraw_assets(&mut self, badge: NonFungibleLocalId) -> Option<Vec<Assets>> {
             assert!(
                 badge == self.owner,
                 "You are not the owner and not allowed to withdraw"
@@ -132,13 +127,7 @@ mod simple_contract {
                 fungible_buckets: Some(vec![self.xrd_vault.as_fungible().take_all()]),
             };
 
-            (
-                Some(vec![asset_to_return]),
-                Some(RoyalityData {
-                    addresses: vec![],
-                    amount: self.service_royality,
-                }),
-            )
+            Some(vec![asset_to_return])
         }
 
         pub fn cancel_escrow(&mut self, badge: NonFungibleLocalId) -> Option<Vec<Assets>> {
