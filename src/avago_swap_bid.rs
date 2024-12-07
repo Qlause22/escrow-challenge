@@ -26,12 +26,10 @@ mod avago_swap_bid {
         bids_vault: FungibleVault,
         bidder: KeyValueStore<NonFungibleLocalId, Decimal>,
         highest_bid: Option<HighestBidder>,
-        service_royality: Decimal,
     }
 
     impl AvagoSwapBid {
         pub fn instantiate(
-            service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u128,
@@ -39,7 +37,6 @@ mod avago_swap_bid {
         ) -> Global<AvagoSwapBid> {
             Self {
                 id,
-                service_royality,
                 owner: owner.clone(),
                 bids_vault: FungibleVault::new(XRD),
                 bidder: KeyValueStore::<NonFungibleLocalId, Decimal>::new_with_registered_type(),

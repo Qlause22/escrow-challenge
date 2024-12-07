@@ -15,7 +15,6 @@ mod avago_swap_basic {
     }
     struct AvagoSwapBasic {
         id: u128,
-        service_royality: Decimal,
         status: Status,
         owner: NonFungibleLocalId,
         taker: Option<NonFungibleLocalId>,
@@ -26,7 +25,6 @@ mod avago_swap_basic {
 
     impl AvagoSwapBasic {
         pub fn instantiate(
-            service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u128,
@@ -34,7 +32,6 @@ mod avago_swap_basic {
         ) -> Global<AvagoSwapBasic> {
             Self {
                 id,
-                service_royality,
                 taker: None,
                 owner: owner.clone(),
                 requested_resource: args.requested_resource,

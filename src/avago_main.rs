@@ -11,6 +11,7 @@ mod avago_proxy {
             change_service_royality => restrict_to : [OWNER];
             claim_custom_royality => restrict_to : [OWNER];
             change_reward_address => restrict_to : [OWNER];
+            pay_royality => restrict_to : [SELF];
             register => PUBLIC;
             unregister => PUBLIC;
             call_component => PUBLIC;
@@ -20,7 +21,6 @@ mod avago_proxy {
     }
     struct AvagoProxy {
         xrd_vault: FungibleVault,
-        service_royality: Decimal,
         resource_manager: ResourceManager,
         swap_style: HashMap<u8, BlueprintId>,
         users: KeyValueStore<ComponentAddress, ()>,
@@ -74,7 +74,6 @@ mod avago_proxy {
 
             Self {
                 xrd_vault: FungibleVault::new(XRD),
-                service_royality: dec!(20),
                 resource_manager: ResourceBuilder::new_integer_non_fungible_with_registered_type::<
                     AvagoBadge,
                 >(owner.clone())
@@ -121,6 +120,7 @@ mod avago_proxy {
                     change_reward_address => Free, locked;
                     create_swap => Free, updatable;
                     create_multiple_swap => Free, updatable;
+                    pay_royality => Xrd(dec!(20)), updatable;
                 }
             })
             .with_address(address_reservation)
@@ -210,13 +210,7 @@ mod avago_proxy {
                 package_address,
                 &blueprint_name,
                 "instantiate",
-                scrypto_args!(
-                    self.service_royality,
-                    local_id,
-                    Runtime::global_address(),
-                    self.id.swap,
-                    args
-                ),
+                scrypto_args!(local_id, Runtime::global_address(), self.id.swap, args),
             ))
             .unwrap()
         }
@@ -249,7 +243,6 @@ mod avago_proxy {
                     &blueprint_name,
                     "instantiate",
                     scrypto_args!(
-                        self.service_royality,
                         &local_id,
                         component_address,
                         self.id.swap,
@@ -270,6 +263,14 @@ mod avago_proxy {
             method: String,
             args: Option<ScryptoValue>,
         ) -> Option<Vec<Assets>> {
+            if method == "withdraw_assets" {
+                ScryptoVmV1Api::object_call(
+                    Runtime::global_component().address().as_node_id(),
+                    "pay_royality",
+                    scrypto_args!(),
+                );
+            }
+
             let local_id = proof
                 .check_with_message(self.resource_manager.address(), "Invalid proof")
                 .as_non_fungible()
@@ -299,12 +300,14 @@ mod avago_proxy {
         }
 
         pub fn change_service_royality(&mut self, amount: Decimal) {
-            self.service_royality = amount;
+            Runtime::global_component().set_royalty("pay_royality", RoyaltyAmount::Xrd(amount));
         }
 
         pub fn change_reward_address(&mut self, address: Option<ComponentAddress>) {
             self.reward_address = address;
         }
+
+        pub fn pay_royality(&self) {}
     }
 }
 

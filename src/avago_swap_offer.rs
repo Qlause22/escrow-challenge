@@ -25,12 +25,10 @@ mod avago_swap_bid {
         offered_resource: AssetsAccumulator,
         offers: KeyValueStore<NonFungibleLocalId, AssetsAccumulator>,
         selected: Option<NonFungibleLocalId>,
-        service_royality: Decimal,
     }
 
     impl AvagoSwapOffer {
         pub fn instantiate(
-            service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u128,
@@ -38,7 +36,6 @@ mod avago_swap_bid {
         ) -> Global<AvagoSwapOffer> {
             Self {
                 id,
-                service_royality,
                 owner: owner.clone(),
                 offers: KeyValueStore::<NonFungibleLocalId, AssetsAccumulator>::new_with_registered_type(),
                 offered_resource: AssetsAccumulator::new(args.offered_resource),

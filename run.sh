@@ -160,7 +160,7 @@ output=$(account_1=${account_address_1} \
   badge=${escrow_badge_1} \
   id="#1#" \
   swap_contract=${swap_component_1} \
-  resim run manifest/basic_swap/07_withdraw_assets.rtm | grep -o "Transaction.*")
+  resim run manifest/basic_swap/07_withdraw_assets.rtm | grep -E "Transaction|Royalties")
 
 echo $output 
 
@@ -384,7 +384,7 @@ output=$(account_1=${account_address_4} \
   badge=${escrow_badge_1} \
   id="#4#" \
   swap_contract=${swap_component_1} \
-  resim run manifest/bidable_swap/07_withdraw_assets.rtm | grep -o "Transaction.*")
+  resim run manifest/bidable_swap/07_withdraw_assets.rtm | grep -E "Transaction|Royalties")
 
 echo $output 
 
@@ -550,14 +550,14 @@ resim show $account_address_1
 echo -e "\n17. Set default account to address 2 and and take all assets from contract."
 resim set-default-account $account_address_2 $private_key_2 $owner_badge_2":"$owner_badge_id_2
 
-echo -e "\n18. Withdraw Assets."
+echo -e "\n18. Withdrawing Assets."
 
 output=$(account_1=${account_address_2} \
   escrow_component=${escrow_component_1} \
   badge=${escrow_badge_1} \
   id="#2#" \
   swap_contract=${swap_component_1} \
-  resim run manifest/offerable_swap/08_withdraw_assets.rtm | grep -o "Transaction.*")
+  resim run manifest/offerable_swap/08_withdraw_assets.rtm | grep -E "Transaction|Royalties")
 
 echo $output 
 

@@ -16,7 +16,6 @@ mod simple_contract {
     struct AvagoSwapSimple {
         id: u128,
         vault: NonFungibleVault,
-        service_royality: Decimal,
         owner: NonFungibleLocalId,
         taker: Option<NonFungibleLocalId>,
         status: Status,
@@ -26,7 +25,6 @@ mod simple_contract {
 
     impl AvagoSwapSimple {
         pub fn instantiate(
-            service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u128,
@@ -36,7 +34,6 @@ mod simple_contract {
                 id,
                 owner,
                 price: args.price,
-                service_royality,
                 taker: None,
                 status: Status {
                     is_sold: false,

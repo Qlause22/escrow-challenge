@@ -15,7 +15,6 @@ mod avago_swap_p2p {
     }
     struct AvagoSwapP2P {
         id: u128,
-        service_royality: Decimal,
         status: Status,
         owner: NonFungibleLocalId,
         taker: NonFungibleLocalId,
@@ -26,7 +25,6 @@ mod avago_swap_p2p {
 
     impl AvagoSwapP2P {
         pub fn instantiate(
-            service_royality: Decimal,
             owner: NonFungibleLocalId,
             main: ComponentAddress,
             id: u128,
@@ -34,7 +32,6 @@ mod avago_swap_p2p {
         ) -> Global<AvagoSwapP2P> {
             Self {
                 id,
-                service_royality,
                 taker: args.taker,
                 owner: owner.clone(),
                 requested_resource: args.requested_resource,
